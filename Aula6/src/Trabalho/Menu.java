@@ -5,8 +5,6 @@ import java.util.*;
 public class Menu {
 
     static Scanner sc = App.sc;
-    static HashMap<String, Item> catalogo = App.catalogo;
-    static ArrayList<Receita> receitas = App.receitas;
 
     private static final String RESET = "\u001B[0m";
     private static final String CYAN = "\u001B[36m";
@@ -140,3 +138,4 @@ public class Menu {
         }
     }
 }
+
