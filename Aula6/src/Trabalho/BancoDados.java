@@ -25,7 +25,7 @@ public class BancoDados {
         Receita carro = new Receita("Carro");
         carro.adicionarIngrediente("Computador de bordo", 1);
         carro.adicionarIngrediente("Chassi", 1);
-        carro.adicionarIngrediente("Rodas", 5);
+        carro.adicionarIngrediente("Rodas", 4);
 
 
 
@@ -50,4 +50,5 @@ public class BancoDados {
 
     }
 }
+
 
