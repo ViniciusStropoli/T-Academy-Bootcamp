@@ -1,0 +1,288 @@
+
+DROP DATABASE IF EXISTS bd_viagemnotempo;
+CREATE DATABASE bd_viagemnotempo;
+USE bd_viagemnotempo;
+
+CREATE TABLE Cliente (
+    idCliente INT PRIMARY KEY,
+    Cliente_Epoca_Existencia DATETIME,
+    Nome VARCHAR(95),
+    Identidade VARCHAR(45),
+    Email VARCHAR(45),
+    Data_Nascimento DATE,
+    Senha VARCHAR(45),
+    Visto TINYINT
+);
+
+CREATE TABLE Classificacao (
+    ID INT PRIMARY KEY,
+    Nivel_Risco VARCHAR(45)
+);
+
+CREATE TABLE PacoteViagem (
+    idPacoteViagem INT PRIMARY KEY,
+    Nome_Pacote VARCHAR(45),
+    Preco DOUBLE,
+    Descricao VARCHAR(255),
+    data_compra DATETIME,
+    Classificacao_ID INT,
+    FOREIGN KEY (Classificacao_ID) REFERENCES Classificacao(ID)
+);
+
+CREATE TABLE Viagem (
+    idViagem INT PRIMARY KEY,
+    Local VARCHAR(45),
+    Data_volta DATETIME,
+    Data_ida DATETIME,
+    Descricao VARCHAR(255),
+    PacoteViagem_idPacoteViagem INT,
+    FOREIGN KEY (PacoteViagem_idPacoteViagem) REFERENCES PacoteViagem(idPacoteViagem)
+);
+
+CREATE TABLE Feedback (
+    ID INT PRIMARY KEY,
+    Nota TINYINT,
+    Descricao VARCHAR(255),
+    PacoteViagem_idPacoteViagem INT,
+    FOREIGN KEY (PacoteViagem_idPacoteViagem) REFERENCES PacoteViagem(idPacoteViagem)
+);
+
+CREATE TABLE Instituicao (
+    idInstituicao INT PRIMARY KEY,
+    Nome VARCHAR(45),
+    Cidade VARCHAR(45),
+    Telefone VARCHAR(45),
+    Email VARCHAR(45)
+);
+
+CREATE TABLE Viagem_has_Cliente (
+    Viagem_idViagem INT,
+    Cliente_idCliente INT,
+    FormaPagamento ENUM('Crédito', 'Débito', 'Boleto', 'Pix'), 
+    DataCompra DATETIME, 
+        
+
+    PRIMARY KEY (Viagem_idViagem, Cliente_idCliente),
+    FOREIGN KEY (Viagem_idViagem) REFERENCES Viagem(idViagem),
+    FOREIGN KEY (Cliente_idCliente) REFERENCES Cliente(idCliente)
+);
+
+CREATE TABLE Instituicao_has_Viagem (
+    Instituicao_idInstituicao INT,
+    Viagem_idViagem INT,
+    PRIMARY KEY (Instituicao_idInstituicao, Viagem_idViagem),
+    FOREIGN KEY (Instituicao_idInstituicao) REFERENCES Instituicao(idInstituicao),
+    FOREIGN KEY (Viagem_idViagem) REFERENCES Viagem(idViagem)
+);
+
+CREATE TABLE Local_periodo (
+    idPeriodo INT PRIMARY KEY,
+    Local VARCHAR(45),
+    Nome VARCHAR(45),
+    Descricao VARCHAR(255),
+    Viagem_idViagem INT,
+    FOREIGN KEY (Viagem_idViagem) REFERENCES Viagem(idViagem)
+);
+
+CREATE TABLE Cronoguarda (
+    idCronoguarda INT PRIMARY KEY,
+    Nome VARCHAR(45),
+    NivelRisco ENUM('Baixo', 'Médio', 'Alto'),
+    Especialidade VARCHAR(100),
+    Descricao VARCHAR(255),
+    PacoteViagem_idPacoteViagem INT,
+    FOREIGN KEY (PacoteViagem_idPacoteViagem) REFERENCES PacoteViagem(idPacoteViagem)
+);
+
+
+INSERT INTO Classificacao (ID, Nivel_Risco)
+VALUES 
+(1, 'Baixo'),
+(2, 'Médio'),
+(3, 'Alto');
+
+INSERT INTO PacoteViagem (idPacoteViagem, Nome_Pacote, Preco, Descricao, data_compra, Classificacao_ID)
+VALUES
+(1, 'Queen Live Aid 1985', 1500.00, 'Assista ao show histórico do Queen em Londres.', NOW(), 1),
+(2, 'Roma Antiga com Aristóteles', 2500.00, 'Imersão filosófica na Grécia e Roma Antiga.', NOW(), 2),
+(3, 'Cidade Futurista 2200', 3000.00, 'Explore a tecnologia do futuro em Neo Londres.', NOW(), 2),
+(4, 'Michael Jackson Dangerous Tour', 1800.00, 'Assista ao Rei do Pop em sua fase de ouro.', NOW(), 1);
+
+INSERT INTO Viagem (idViagem, Local, Data_volta, Data_ida, Descricao, PacoteViagem_idPacoteViagem)
+VALUES
+(1, 'Londres 1985', '1985-07-14', '1985-07-13', 'Queen ao vivo no Live Aid.', 1),
+(2, 'Atenas Antiga', '0300-05-15', '0300-05-01', 'Aula com Aristóteles em praça pública.', 2),
+(3, 'Neo Londres 2200', '2200-06-10', '2200-06-01', 'Visita a uma cidade futurista.', 3),
+(4, 'Bucareste 1992', '1992-10-02', '1992-10-01', 'Michael Jackson Dangerous Tour.', 4);
+
+INSERT INTO Cliente (idCliente, Cliente_Epoca_Existencia, Nome, Identidade, Email, Data_Nascimento, Visto)
+VALUES
+(1, '1985-07-13', 'João da Silva', '123456789', 'joao@email.com', '1990-05-20', 1),
+(2, '0300-05-01', 'Maria Oliveira', '987654321', 'maria@email.com', '1995-11-02', 1),
+(3, '2200-06-01', 'Lucas Pereira', '555666777', 'lucas@email.com', '2000-03-15', 1);
+
+INSERT INTO Instituicao (idInstituicao, Nome, Cidade, Telefone, Email)
+VALUES
+(1, 'Universidade Clássica de Roma', 'Roma Antiga', '0000-0000', 'contato@ucr.roma'),
+(2, 'Oxford do Futuro', 'Neo Londres', '1111-1111', 'contato@oxfuturo.com');
+
+INSERT INTO Viagem_has_Cliente (Viagem_idViagem, Cliente_idCliente)
+VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 1);
+
+INSERT INTO Instituicao_has_Viagem (Instituicao_idInstituicao, Viagem_idViagem)
+VALUES
+(1, 2),
+(2, 3);
+
+-- 8. Feedbacks
+INSERT INTO Feedback (ID, Nota, Descricao, PacoteViagem_idPacoteViagem)
+VALUES
+(1, 5, 'Parecia que eu estava realmente lá, inesquecível!', 1),
+(2, 4, 'Experiência cultural incrível, mas cansativa.', 2),
+(3, 5, 'Tecnologia impressionante, recomendo!', 3),
+(4, 3, 'Show incrível, mas o tempo de viagem foi curto.', 4);
+
+-- 9. Cronoguarda
+INSERT INTO Cronoguarda (idCronoguarda, Nome, NivelRisco, Especialidade, Descricao, PacoteViagem_idPacoteViagem)
+VALUES
+(1, 'Marcus Tempus', 'Médio', 'História Antiga', 'Guia especializado em filosofia clássica.', 2),
+(2, 'Lia Quantum', 'Baixo', 'Tecnologia Futurista', 'Instrutora em Neo Londres 2200.', 3);
+
+-- 10. Local / Período
+INSERT INTO Local_periodo (idPeriodo, Local, Nome, Descricao, Viagem_idViagem)
+VALUES
+(1, 'Estádio Wembley', 'Live Aid', 'Assistir Queen ao vivo em 1985.', 1),
+(2, 'Ágora de Atenas', 'Aula de Filosofia', 'Debate com Aristóteles.', 2),
+(3, 'Neo Londres', 'Visita Tecnológica', 'Explorar carros voadores e IA.', 3);
+
+
+==== selects
+
+
+-- 1. Pacotes disponíveis com risco "Seguro"
+SELECT Nome_Pacote, Descricao, Local, Data_ida AS Epoca_Destino, Preco
+FROM PacoteViagem pv
+JOIN Viagem v ON v.PacoteViagem_idPacoteViagem = pv.idPacoteViagem
+JOIN Classificacao c ON pv.Classificacao_ID = c.ID
+WHERE c.Nivel_Risco = 'Seguro';
+
+-- 2. Top 5 períodos temporais mais populares
+SELECT v.Local AS Periodo, v.Descricao, COUNT(vc.Cliente_idCliente) AS Vendas
+FROM Viagem v
+JOIN Viagem_has_Cliente vc ON v.idViagem = vc.Viagem_idViagem
+GROUP BY v.Local, v.Descricao
+ORDER BY Vendas DESC
+LIMIT 5;
+
+-- 3. Pacotes adquiridos por clientes que compraram o mesmo pacote de outro cliente
+SELECT DISTINCT pv.Nome_Pacote, pv.Descricao, v.Local, v.Data_ida, pv.Preco
+FROM Viagem_has_Cliente vc1
+JOIN Viagem_has_Cliente vc2 ON vc1.Viagem_idViagem = vc2.Viagem_idViagem AND vc1.Cliente_idCliente <> vc2.Cliente_idCliente
+JOIN Viagem v ON vc2.Viagem_idViagem = v.idViagem
+JOIN PacoteViagem pv ON v.PacoteViagem_idPacoteViagem = pv.idPacoteViagem
+WHERE vc1.Cliente_idCliente = 1;
+
+-- 4. Clientes com avaliações mais baixas de um pacote
+SELECT c.Nome, f.Nota
+FROM Feedback f
+JOIN PacoteViagem p ON f.PacoteViagem_idPacoteViagem = p.idPacoteViagem
+JOIN Viagem v ON v.PacoteViagem_idPacoteViagem = p.idPacoteViagem
+JOIN Viagem_has_Cliente vc ON vc.Viagem_idViagem = v.idViagem
+JOIN Cliente c ON vc.Cliente_idCliente = c.idCliente
+WHERE p.idPacoteViagem = 3
+ORDER BY f.Nota ASC;
+
+-- 5. Cronoguardas de um pacote
+SELECT cg.Nome, cg.Descricao
+FROM Cronoguarda cg
+WHERE cg.PacoteViagem_idPacoteViagem = 2;
+
+-- 6. Pacotes mais vendidos no último trimestre
+SELECT pv.Nome_Pacote, pv.Descricao, v.Local, DATEDIFF(v.Data_volta, v.Data_ida) AS Duracao, COUNT(vc.Cliente_idCliente) AS Vendas
+FROM PacoteViagem pv
+JOIN Viagem v ON v.PacoteViagem_idPacoteViagem = pv.idPacoteViagem
+JOIN Viagem_has_Cliente vc ON vc.Viagem_idViagem = v.idViagem
+WHERE v.Data_ida >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+GROUP BY pv.Nome_Pacote, pv.Descricao, v.Local, v.Data_ida, v.Data_volta
+ORDER BY Vendas DESC;
+
+-- 7. Pacotes por duração
+SELECT pv.Nome_Pacote, pv.Descricao, v.Local, DATEDIFF(v.Data_volta, v.Data_ida) AS Duracao, pv.Preco
+FROM PacoteViagem pv
+JOIN Viagem v ON v.PacoteViagem_idPacoteViagem = pv.idPacoteViagem
+WHERE DATEDIFF(v.Data_volta, v.Data_ida) BETWEEN 3 AND 7;
+
+-- 8. Cliente já visitou uma época?
+SELECT CASE WHEN COUNT(*) > 0 THEN 'SIM' ELSE 'NÃO' END AS JaVisitou
+FROM Viagem_has_Cliente vc
+JOIN Viagem v ON vc.Viagem_idViagem = v.idViagem
+JOIN Cliente c ON vc.Cliente_idCliente = c.idCliente
+WHERE c.Nome = 'Maria Oliveira' AND v.Local = 'Roma Antiga';
+
+-- 9. Pacotes disponíveis nas próximas 2 semanas
+SELECT pv.Nome_Pacote, pv.Descricao, v.Local, DATEDIFF(v.Data_volta, v.Data_ida) AS Duracao, pv.Preco
+FROM PacoteViagem pv
+JOIN Viagem v ON v.PacoteViagem_idPacoteViagem = pv.idPacoteViagem
+WHERE v.Data_ida BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 14 DAY);
+
+-- 10. Épocas menos visitadas nos últimos 6 meses
+SELECT v.Local AS Epoca, v.Descricao, COUNT(vc.Cliente_idCliente) AS Vendas
+FROM Viagem v
+LEFT JOIN Viagem_has_Cliente vc ON v.idViagem = vc.Viagem_idViagem
+WHERE v.Data_ida >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+GROUP BY v.Local, v.Descricao
+ORDER BY Vendas ASC;
+
+
+
+
+
+==============================
+
+
+
+
+
+use bd_viagemnotempo;
+
+
+DELIMITER //
+
+-- Trigger de INSERT
+
+CREATE TRIGGER trg_add_cliente_viagem
+AFTER INSERT ON Viagem_has_Cliente
+FOR EACH ROW
+BEGIN
+  UPDATE Viagem
+  SET NumeroClientes = NumeroClientes + 1
+  WHERE idViagem = NEW.Viagem_idViagem;
+END;
+
+//
+DELIMITER ; 
+
+=========
+
+DELIMITER //
+
+-- Trigger de DELETE (se um cliente cancelar)
+
+CREATE TRIGGER trg_remove_cliente_viagem
+AFTER DELETE ON Viagem_has_Cliente
+FOR EACH ROW
+BEGIN
+  UPDATE Viagem
+  SET NumeroClientes = NumeroClientes - 1
+  WHERE idViagem = OLD.Viagem_idViagem;
+END;
+
+//
+DELIMITER ;
+
+
+
