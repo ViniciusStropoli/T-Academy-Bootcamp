@@ -1,0 +1,9 @@
+package com.aula.projeto03.repositories;
+
+import com.aula.projeto03.models.Periodo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PeriodoRepository extends JpaRepository<Periodo, Long>{
+}
