@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record TarefaDto(
-        Long id,
 
         @NotBlank(message = "O título é obrigatório")
         String titulo,
@@ -28,3 +27,4 @@ public record TarefaDto(
         Long categoriaId
 
 ) {}
+
